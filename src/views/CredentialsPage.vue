@@ -137,7 +137,7 @@ export default {
   methods: {
     fetchCredentials() {
       this.loading = true
-      this.makeRequest('post', 'artillery-service/v1/credential.list')
+     this.makeRequest('post', 'artillery-service/v1/credential.list')
         .then((response) => {
           this.credentials = response.data.results
           this.totalCredentials = this.credentials.length
@@ -147,12 +147,6 @@ export default {
           if (linodeToken) {
             this.linodeToken = linodeToken.value
             localStorage.setItem('linodeToken', this.linodeToken)
-          } else {
-            this.newCredential = {
-              name: 'LINODE_TOKEN',
-              value: '<your-linode-token>'
-            }
-            this.createCredential()
           }
         })
         .catch((error) => {

@@ -22,27 +22,29 @@
             <el-table-column prop="version" label="Version" align="center" />
             <el-table-column label="Plan">
                 <template #default="scope">
-                    <p>{{ linode_types.filter(plan => plan.id === scope.row.plan_id).length > 0 ?
-                        linode_types.find(plan => plan.id === scope.row.plan_id).label : scope.row.plan_id }}</p>
+                    <p>{{linode_types.filter(plan => plan.id === scope.row.plan_id).length > 0 ?
+                        linode_types.find(plan => plan.id === scope.row.plan_id).label : scope.row.plan_id}}</p>
                 </template>
             </el-table-column>
             <el-table-column label="Image">
                 <template #default="scope">
-                    <p>{{ images.filter(image => image.id === scope.row.image_id).length > 0 ? images.find(image =>
-                        image.id === scope.row.image_id).label : scope.row.image_id }}</p>
+                    <p>{{images.filter(image => image.id === scope.row.image_id).length > 0 ? images.find(image =>
+                        image.id === scope.row.image_id).label : scope.row.image_id}}</p>
                 </template>
             </el-table-column>
             <el-table-column label="Region">
                 <template #default="scope">
-                    <p>{{ regions.filter(region => region.id === scope.row.region_id).length > 0 ?
-                        regions.find(region => region.id === scope.row.region_id).label : scope.row.region_id }}</p>
+                    <p>{{regions.filter(region => region.id === scope.row.region_id).length > 0 ?
+                        regions.find(region => region.id === scope.row.region_id).label : scope.row.region_id}}</p>
                 </template>
             </el-table-column>
             <el-table-column label="Firewall">
                 <template #default="scope">
-                    <p>{{ firewalls.filter(firewall => firewall.id === scope.row.firewall_id).length > 0 ?
-                        firewalls.find(firewall => firewall.id === scope.row.firewall_id).label : scope.row.firewall_id
-                        }}</p>
+                    <p>{{scope.row.firewall_id ?
+                        (firewalls.filter(firewall => firewall.id === scope.row.firewall_id).length > 0 ?
+                            firewalls.find(firewall => firewall.id === scope.row.firewall_id).label :
+                            scope.row.firewall_id) :
+                        'None' }}</p>
                 </template>
             </el-table-column>
             <el-table-column label="Created At">
@@ -78,7 +80,8 @@
                 <el-input v-model="newLaunchTemplate.name" required />
             </el-form-item>
             <el-form-item label="Instance Password">
-                <el-input v-model="newLaunchTemplate.password" placeholder="Password for instance" required>
+                <el-input v-model="newLaunchTemplate.password"  type="password"
+                show-password placeholder="Password for instance" required>
                     <template #append>
                         <el-icon class="cursor-pointer" @click="generatePassword('new')">
                             <Switch />
@@ -135,7 +138,9 @@
                 <el-input v-model="newLaunchTemplate.port" />
             </el-form-item>
             <el-form-item label="Firewall ID">
-                <el-input v-model="newLaunchTemplate.firewall_id" placeholder="Enter Firewall ID manually"></el-input>
+                <el-input v-model.number="newLaunchTemplate.firewall_id" placeholder="Leave empty for no firewall"
+                    type="number" :min="0" @input="handleFirewallInput('new')">
+                </el-input>
             </el-form-item>
 
         </el-form>
@@ -156,7 +161,8 @@
                 <el-input v-model="editingLaunchTemplate.version" disabled />
             </el-form-item>
             <el-form-item label="Instance Password">
-                <el-input v-model="editingLaunchTemplate.password" placeholder="Password for instance">
+                <el-input v-model="editingLaunchTemplate.password"  type="password"
+                show-password placeholder="Password for instance">
                     <template #append>
                         <el-icon class="cursor-pointer" @click="generatePassword('edit')">
                             <Switch />
@@ -211,7 +217,9 @@
                 <el-input v-model="editingLaunchTemplate.port" />
             </el-form-item>
             <el-form-item label="Firewall ID">
-                <el-input v-model="newLaunchTemplate.firewall_id" placeholder="Enter Firewall ID manually"></el-input>
+                <el-input v-model.number="editingLaunchTemplate.firewall_id" placeholder="Leave empty for no firewall"
+                    type="number" :min="0" @input="handleFirewallInput('edit')">
+                </el-input>
             </el-form-item>
 
         </el-form>
@@ -355,6 +363,23 @@ export default {
                     this.loading = false;
                 });
         },
+        handleFirewallInput(type) {
+            if (type === 'new') {
+                if (this.newLaunchTemplate.firewall_id < 0) {
+                    this.newLaunchTemplate.firewall_id = 0;
+                }
+                if (this.newLaunchTemplate.firewall_id === '') {
+                    this.newLaunchTemplate.firewall_id = 0;
+                }
+            } else {
+                if (this.editingLaunchTemplate.firewall_id < 0) {
+                    this.editingLaunchTemplate.firewall_id = 0;
+                }
+                if (this.editingLaunchTemplate.firewall_id === '') {
+                    this.editingLaunchTemplate.firewall_id = 0;
+                }
+            }
+        },
         // fetchFirewalls() {
         //     axios.get('https://api.linode.com/v4/networking/firewalls?page=1&page_size=100', {
         //         headers: {
@@ -451,7 +476,7 @@ export default {
                             start_command: ""
                         },
                         port: '80',
-                        firewall_id: 0,
+                        firewall_id: this.newLaunchTemplate.firewall_id || 0,
                     };
                     this.fetchLaunchTemplates();
                     this.$message.success('Launch template created successfully');
@@ -504,7 +529,7 @@ export default {
             launchTemplateRevision.launch_data.run_script = btoa(this.editingLaunchTemplate.launch_data.run_script);
             launchTemplateRevision.launch_data.start_command = btoa(this.editingLaunchTemplate.launch_data.start_command);
             launchTemplateRevision.is_private_image = this.editingLaunchTemplate.image_id.includes('private');
-            launchTemplateRevision.firewall_id = parseInt(launchTemplateRevision.firewall_id);
+            launchTemplateRevision.firewall_id = this.editingLaunchTemplate.firewall_id !== null ? parseInt(this.editingLaunchTemplate.firewall_id) : 0;
             this.makeRequest('post', 'asg-service/v1/launchTemplate.update', launchTemplateRevision)
                 .then(() => {
                     this.showEditLaunchTemplateDialog = false;

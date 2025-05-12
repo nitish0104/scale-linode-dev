@@ -26,11 +26,11 @@ const mixin = {
                 readOnly: true,
             },
             linodeToken: '',
-            corsHost: 'https://cors-anywhere.brahmastra.tech/',
-            apiHostProd: 'https://api.apwest.scalelinode.com/',
-            apiHostUat: 'https://api.apwest.uat.scalelinode.com/',
-            apiHostDev: 'https://api.apwest.dev.scalelinode.com/',
-            cloudApi: 'https://cors-anywhere.brahmastra.tech/https://cloud.linode.com',
+            corsHost: import.meta.env.VITE_CORS_HOST,
+            apiHostProd: import.meta.env.VITE_API_HOST_PROD,
+            apiHostUat: import.meta.env.VITE_API_HOST_UAT,
+            apiHostDev: import.meta.env.VITE_API_HOST_DEV,
+            cloudApi: import.meta.env.VITE_CLOUD_API,
         }
     },
     computed: {
