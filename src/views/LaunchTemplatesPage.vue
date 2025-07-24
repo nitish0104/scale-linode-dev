@@ -75,12 +75,12 @@
     <!-- Add Dialog -->
     <el-dialog title="Add Launch Template" v-model="showAddLaunchTemplateDialog" class="bg-white rounded-md"
         append-to-body>
-        <el-form :model="newLaunchTemplate" label-position="top">
-            <el-form-item label="Name">
-                <el-input v-model="newLaunchTemplate.name" required />
+        <el-form :model="newLaunchTemplate"  label-position="top">
+            <el-form-item label="Name" readonly onfocus="this.removeAttribute('readonly')" >
+                <el-input v-model="newLaunchTemplate.name" placeholder="Launch template name"  required />
             </el-form-item>
             <el-form-item label="Instance Password">
-                <el-input v-model="newLaunchTemplate.password"  type="password"
+                <el-input v-model="newLaunchTemplate.password" readonly onfocus="this.removeAttribute('readonly')"   type="password"
                 show-password placeholder="Password for instance" required>
                     <template #append>
                         <el-icon class="cursor-pointer" @click="generatePassword('new')">
@@ -269,8 +269,8 @@ export default {
                     run_script: "",
                     start_command: ""
                 },
-                port: '80',
-                firewall_id: 0,
+ port: '', 
+    firewall_id: null, 
             },
             editingLaunchTemplate: null,
             environments: [], // Assuming environments data will be fetched
