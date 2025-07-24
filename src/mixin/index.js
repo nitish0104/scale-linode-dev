@@ -82,7 +82,7 @@ const mixin = {
         },
         makeRequest(method, endpoint, data = {}, headers = {}, params = {}) {
             this.loading = true;
-        
+
             let config = {
                 method: method,
                 url: `${this.apiUrl}${endpoint}`,
@@ -93,18 +93,18 @@ const mixin = {
                     ...headers
                 }
             };
-        
+
             if (method === 'post') {
                 config.data = data;
             } else if (method === 'get') {
                 config.params = params;
             }
-        
+
             return axios(config)
-                .then(response => response) 
+                .then(response => response)
                 .catch(error => {
-                    this.showErrorMessage(error); 
-                    return Promise.reject(error); 
+                    this.showErrorMessage(error);
+                    return Promise.reject(error);
                 })
                 .finally(() => {
                     this.loading = false;
@@ -156,13 +156,13 @@ const mixin = {
             if (error.response && error.response.data) {
                 let errorMessage = 'Error: ';
                 const errorData = error.response.data.error;
-        
+
                 if (Array.isArray(errorData)) {
-                    errorMessage += errorData.join(', '); 
+                    errorMessage += errorData.join(', ');
                 } else {
                     errorMessage += errorData;
                 }
-        
+
                 this.$message.error({ message: errorMessage, dangerouslyUseHTMLString: true });
             } else {
                 this.$message.error('An unknown error occurred.');
